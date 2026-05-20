@@ -19,7 +19,11 @@ You built a service with distinct layers: models, schemas, repository, service, 
 Think about what happens six months later when someone new joins the team, or when you need to swap SQLite for PostgreSQL. What does the layered structure protect you from?
 
 > *Your answer:*
+Putting everything in one file might work for a very small project, but it quickly becomes difficult to maintain as the application grows. The layered structure keeps responsibilities separated, which makes the code easier to understand, test, and modify later.
 
+For example, if we decide to switch from SQLite to PostgreSQL in the future, most of the changes would stay inside the repository or database layer without affecting the routes or business logic. It also helps new developers understand the project faster because each file has a clear purpose.
+
+This structure protects the project from becoming tightly coupled and disorganized over time.
 ---
 
 ## 2. Your choice
@@ -31,6 +35,13 @@ Each service owns its data exclusively — no other service is allowed to touch 
 Give a concrete scenario, not a general principle.
 
 > *Your answer:*
+The `Game` entity should only be modified by the `game-service`.
+
+For example, if the `activity-service` could directly write to the `games` table, it could accidentally insert invalid or incomplete game data. A bug in another service might overwrite a game's title or delete important information without the game-service knowing about it.
+
+This would create inconsistent data and make debugging much harder because multiple services would be changing the same table independently.
+
+By keeping ownership inside the game-service, all validation and business rules stay centralized in one place.
 
 ---
 
@@ -43,6 +54,13 @@ You now have models, schemas, a repository, a service, and routes — five layer
 And at what point does the complexity start to pay off? Where is the tipping point?
 
 > *Your answer:*
+The `Game` entity should only be modified by the `game-service`.
+
+For example, if the `activity-service` could directly write to the `games` table, it could accidentally insert invalid or incomplete game data. A bug in another service might overwrite a game's title or delete important information without the game-service knowing about it.
+
+This would create inconsistent data and make debugging much harder because multiple services would be changing the same table independently.
+
+By keeping ownership inside the game-service, all validation and business rules stay centralized in one place.
 
 ---
 
