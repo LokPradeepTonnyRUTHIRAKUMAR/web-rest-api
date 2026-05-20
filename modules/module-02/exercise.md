@@ -132,4 +132,4 @@ Also confirm `aiosqlite` is in your `requirements.txt` — the CI test runner us
 - [ ] At least one test passing in `game-service/tests/`
 - [ ] `REFLECTION.md` completed and committed
 
-If you run out of time: the search endpoint is optional. The other three are not.
+If you run out of time: the search endpoint is optional. The other three are not
