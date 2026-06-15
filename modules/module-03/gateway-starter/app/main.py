@@ -105,3 +105,49 @@ async def proxy(request: Request, path: str):
     """
     # TODO: implement steps 1–4 above
     raise NotImplementedError("implement the proxy forwarding logic")
+    segments = path.split("/")
+
+    # Step 1
+    if len(segments) < 2:
+        return Response(
+            status_code=404,
+            content="Invalid path"
+        )
+
+    resource = segments[1]
+
+    # Step 2
+    target_base = ROUTES.get(resource)
+
+    if target_base is None:
+        return Response(
+            status_code=404,
+            content=f"Unknown resource: {resource}"
+        )
+
+    # Step 3
+    target_url = f"{target_base}/{path}"
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.request(
+                method=request.method,
+                url=target_url,
+                headers=request.headers.raw,
+                content=await request.body(),
+                params=request.query_params,
+            )
+
+        return Response(
+            content=response.content,
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            media_type=response.headers.get("content-type"),
+        )
+
+    # Step 4
+    except httpx.RequestError:
+        return Response(
+            status_code=503,
+            content="Service unavailable"
+        )
