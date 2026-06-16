@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import Base, engine, get_db
 from app import repository, schemas
+from app.infrastructure.rabbitmq_publisher import publish_activity_event
 
 Base.metadata.create_all(bind=engine)
 
@@ -21,7 +22,7 @@ async def validate_user(user_id: str) -> None:
     """
     url = f"{settings.user_service_url}/v1/users/{user_id}"
 
-    for attempt in range(2):  # first attempt + one retry
+    for attempt in range(2):
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.get(url)
@@ -83,6 +84,15 @@ async def create_activity(data: schemas.ActivityCreate, db: Session = Depends(ge
     activity = repository.create_activity(db, data)
 
     game_data = await fetch_game(activity.game_id)
+
+    game_title = game_data["title"] if game_data else None
+
+    await publish_activity_event(
+        user_id=activity.user_id,
+        game_id=activity.game_id,
+        action=activity.action,
+        game_title=game_title,
+    )
 
     return {
         "id": activity.id,
