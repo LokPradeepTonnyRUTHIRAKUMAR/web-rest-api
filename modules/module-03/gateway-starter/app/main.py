@@ -103,8 +103,7 @@ async def proxy(request: Request, path: str):
         curl http://localhost:8000/v1/activities
         curl http://localhost:8000/v1/unknown   # should return 404
     """
-    # TODO: implement steps 1–4 above
-    raise NotImplementedError("implement the proxy forwarding logic")
+   
     segments = path.split("/")
 
     # Step 1
