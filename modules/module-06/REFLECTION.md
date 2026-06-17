@@ -19,6 +19,10 @@ The gateway now validates every JWT before forwarding a request. Individual serv
 Think about what happens when you need to rotate the secret key, or add a new service to the system.
 
 > *Your answer:*
+>
+> Centralizing authentication at the gateway simplifies the system because token validation is implemented only once. Individual services can focus on their business logic instead of repeatedly implementing authentication code.
+>
+> If every service validated tokens independently, each service would need the same security configuration and validation logic. Rotating secret keys or adding a new service would require updating every service separately. With a gateway, these changes only need to be made in one place.
 
 ---
 
@@ -31,6 +35,10 @@ When activity-service calls user-service internally, it uses a Machine-to-Machin
 What would break, or what door would you accidentally leave open, if services passed user tokens between themselves?
 
 > *Your answer:*
+>
+> Activity-service should not reuse the user's token because that token represents the user's identity and permissions, not the identity of the service itself. Internal service-to-service communication should use a Machine-to-Machine token that represents a trusted system component.
+>
+> Passing user tokens between services could create security risks because downstream services might incorrectly treat internal requests as direct user actions. It would also make it harder to control permissions and audit which actions were performed by users versus system components.
 
 ---
 
@@ -43,6 +51,10 @@ The gateway and the auth-service share the same `SECRET_KEY` to verify tokens wi
 And what would the alternative look like — verifying tokens by calling auth-service on every request instead? What does that cost you?
 
 > *Your answer:*
+>
+> Sharing the same SECRET_KEY between the gateway and auth-service creates a risk because anyone who obtains the key can create valid tokens and impersonate users or services. A leaked key compromises the entire authentication system until the key is rotated.
+>
+> An alternative would be for the gateway to call auth-service on every request to verify tokens. This improves security because the secret remains in one place, but it increases latency and creates an additional dependency. Every request would require a network call, making the system slower and making the gateway dependent on auth-service availability.
 
 ---
 
